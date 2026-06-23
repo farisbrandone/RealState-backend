@@ -1,10 +1,12 @@
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    { url: 'https://luxhorizon.com', lastModified: new Date() },
-    { url: 'https://luxhorizon.com/search', lastModified: new Date() },
-    { url: 'https://luxhorizon.com/login', lastModified: new Date() },
-    // ajouter les propriétés dynamiquement ? Vous pouvez faire un fetch ici si besoin.
+    { url: "https://luxhorizon.com", lastModified: new Date() },
+    { url: "https://luxhorizon.com/search", lastModified: new Date() },
+    { url: "https://luxhorizon.com/agents", lastModified: new Date() },
+    { url: "https://luxhorizon.com/agencies", lastModified: new Date() },
+    { url: "https://luxhorizon.com/estimate", lastModified: new Date() },
+    { url: "https://luxhorizon.com/contact", lastModified: new Date() },
   ];
 }

@@ -13,7 +13,7 @@ import {
 export default function DashboardOverviewPage() {
   const user = useAuthStore((s) => s.user);
   const { data: propertiesData } = useMyProperties(user?.id || "", 1, 5);
-  const propertyCount = propertiesData?.data?.total || 0;
+  const propertyCount = propertiesData?.total || 0;
 
   return (
     <div>

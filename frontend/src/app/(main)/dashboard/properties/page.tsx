@@ -17,7 +17,7 @@ export default function MyPropertiesPage() {
   const deleteMutation = useDeleteProperty();
   const { publish, unpublish } = usePublishProperty();
 
-  const properties = data?.data?.items || [];
+  const properties = data?.items || [];
 
   const handleDelete = (id: string) => {
     if (confirm("Supprimer définitivement ce bien ?")) {

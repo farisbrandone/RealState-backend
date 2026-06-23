@@ -1,13 +1,26 @@
-import httpClient from '../clients/http.client';
+import httpClient from "../clients/http.client";
 
 export const authApi = {
-  login: (email: string, password: string) => httpClient.post('/auth/login', { email, password }),
-  register: (data: any) => httpClient.post('/auth/register', data),
-  refresh: (refreshToken: string) => httpClient.post('/auth/refresh', { refreshToken }),
+  login: (email: string, password: string) =>
+    httpClient.post("/auth/login", { email, password }),
+  register: (data: any) => httpClient.post("/auth/register", data),
+  refresh: (refreshToken: string) =>
+    httpClient.post("/auth/refresh", { refreshToken }),
   requestPasswordReset: (email: string) =>
-    httpClient.post('/auth/verification/request-password-reset', { email }),
+    httpClient.post("/auth/verification/request-password-reset", { email }),
   resetPassword: (token: string, newPassword: string) =>
-    httpClient.post('/auth/verification/reset-password', { token, newPassword }),
-  verifyEmail: (token: string) => httpClient.post('/auth/verification/verify-email', { token }),
-  getMe: () => httpClient.get('/auth/user/me'),
+    httpClient.post("/auth/verification/reset-password", {
+      token,
+      newPassword,
+    }),
+  verifyEmail: (token: string) =>
+    httpClient.post("/auth/verification/verify-email", { token }),
+  getMe: () => httpClient.get("/auth/user/me"),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    httpClient.put("/auth/user/password", { currentPassword, newPassword }),
+
+  getSessions: () => httpClient.get("/auth/sessions"),
+
+  revokeSession: (sessionId: string) =>
+    httpClient.delete(`/auth/sessions/${sessionId}`),
 };

@@ -8,7 +8,13 @@ import { fr } from "date-fns/locale";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
-export const ChatSidebar: React.FC = () => {
+interface ChatSidebarProps {
+  onSelectConversation?: () => void;
+}
+
+export const ChatSidebar: React.FC<ChatSidebarProps> = ({
+  onSelectConversation,
+}) => {
   const { data: conversations, isLoading } = useConversations();
   const activeId = useChatStore((s) => s.activeConversationId);
   const setActive = useChatStore((s) => s.setActiveConversation);
@@ -74,7 +80,10 @@ export const ChatSidebar: React.FC = () => {
           filteredConversations.map((conv: Conversation) => (
             <button
               key={conv.id}
-              onClick={() => setActive(conv.id)}
+              onClick={() => {
+                setActive(conv.id);
+                onSelectConversation?.();
+              }}
               className={`w-full text-left p-4 hover:bg-primary-50 border-b border-primary-50 transition-colors ${
                 activeId === conv.id ? "bg-primary-100" : ""
               }`}
