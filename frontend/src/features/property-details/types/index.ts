@@ -49,6 +49,7 @@ export interface PropertyDetail {
     hasSecurity?: boolean;
     hasFence?: boolean;
     hasBorehole?: boolean;
+    hasGarage?: boolean;
   };
   listing: {
     type: "sale" | "rent";
