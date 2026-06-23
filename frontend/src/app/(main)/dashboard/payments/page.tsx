@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { paymentApi } from '@/shared/api/endpoints/payment.endpoints';
-import { Card } from '@/shared/ui/components/Card/Card';
-import { formatPrice } from '@/shared/lib/formatters/currency.formatter';
-import { format } from 'date-fns';
+import { useQuery } from "@tanstack/react-query";
+import { paymentApi } from "@/shared/api/endpoints/payment.endpoints";
+import { Card } from "@/shared/ui/components/Card/Card";
+import { formatPrice } from "@/shared/lib/formatters/currency.formatter";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export default function PaymentsPage() {
   const { data, isLoading } = useQuery({
-    queryKey: ['payments'],
+    queryKey: ["payments"],
     queryFn: () => paymentApi.getPayments({ limit: 20 }),
   });
 
@@ -19,14 +20,26 @@ export default function PaymentsPage() {
       <h1 className="text-2xl font-heading mb-6">Historique des paiements</h1>
       {isLoading ? (
         <p>Chargement...</p>
+      ) : payments.length === 0 ? (
+        <Card className="text-center py-8">
+          <p className="text-primary-500">Aucun paiement pour le moment.</p>
+        </Card>
       ) : (
         <div className="space-y-3">
           {payments.map((payment: any) => (
-            <Card key={payment.id} padding="md" className="flex justify-between items-center">
+            <Card
+              key={payment.id}
+              padding="md"
+              className="flex justify-between items-center"
+            >
               <div>
-                <p className="font-medium">{payment.description || 'Paiement'}</p>
+                <p className="font-medium">
+                  {payment.description || "Paiement"}
+                </p>
                 <p className="text-sm text-primary-500">
-                  {format(new Date(payment.createdAt), 'dd/MM/yyyy HH:mm')}
+                  {format(new Date(payment.createdAt), "dd MMMM yyyy à HH:mm", {
+                    locale: fr,
+                  })}
                 </p>
               </div>
               <div className="text-right">
