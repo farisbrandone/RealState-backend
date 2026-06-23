@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShareIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 
@@ -14,10 +14,15 @@ export const PropertyShare: React.FC<PropertyShareProps> = ({
   propertyTitle,
 }) => {
   const [open, setOpen] = useState(false);
-  const url = `${window.location.origin}/properties/${propertyId}`;
+  const [url, setUrl] = useState("");
+  //const url = `${window.location.origin}/properties/${propertyId}`;
   const text = encodeURIComponent(
     `Découvrez "${propertyTitle}" sur LuxHorizon !`,
   );
+
+  useEffect(() => {
+    setUrl(window.location.origin + `/properties/${propertyId}`);
+  }, [propertyId]);
 
   const shareLinks = [
     {
