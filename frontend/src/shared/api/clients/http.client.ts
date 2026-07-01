@@ -39,10 +39,12 @@ httpClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = useAuthStore.getState().refreshToken;
+        console.log({ refreshToken });
         if (!refreshToken) throw new Error("No refresh token");
         const { data } = await axios.post(`${API_GATEWAY_URL}/auth/refresh`, {
           refreshToken,
         });
+        console.log({ data });
         useAuthStore.getState().setTokens(data.accessToken, data.refreshToken);
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
@@ -54,6 +56,7 @@ httpClient.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+    console.log(error);
     return Promise.reject(error);
   },
 );

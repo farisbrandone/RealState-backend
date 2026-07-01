@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
-import axios from 'axios';
+import { NextResponse } from "next/server";
+import axios from "axios";
 
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:3000/api/v1';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:3002/api/v1";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     // Envoyer une notification via le service notification (email à l'agent)
     const res = await axios.post(`${API_GATEWAY_URL}/notifications`, {
-      type: 'CONTACT_FORM',
+      type: "CONTACT_FORM",
       recipient: {
         email: body.agentEmail,
       },
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
           propertyId: body.propertyId,
         },
       },
-      channel: { channels: ['email'] },
+      channel: { channels: ["email"] },
     });
     return NextResponse.json({ success: true });
   } catch (error) {

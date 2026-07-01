@@ -27,21 +27,21 @@ import { useSearchParams } from "next/navigation";
 
 const ROLES = [
   {
-    value: "USER",
+    value: "user",
     title: "Utilisateur",
     description: "Recherchez des biens immobiliers",
     icon: "🔍",
     trial: "2 jours d'essai gratuit",
   },
   {
-    value: "AGENT",
+    value: "agent",
     title: "Agent immobilier",
     description: "Publiez et gérez vos annonces",
     icon: "🏢",
     trial: "1 mois de publication gratuite",
   },
   {
-    value: "OWNER",
+    value: "owner",
     title: "Propriétaire",
     description: "Publiez vos propres biens",
     icon: "🏠",

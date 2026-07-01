@@ -25,6 +25,8 @@ export default function MyPropertiesPage() {
     }
   };
 
+  console.log(properties);
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -55,7 +57,7 @@ export default function MyPropertiesPage() {
               <div className="flex items-center gap-4">
                 <img
                   src={
-                    property.media?.[0]?.url ||
+                    property._media?.[0]?.url ||
                     "/images/property-placeholder.jpg"
                   }
                   alt=""
@@ -65,18 +67,18 @@ export default function MyPropertiesPage() {
                   <h3 className="font-medium">{property.title}</h3>
                   <p className="text-sm text-primary-500">
                     {formatPrice(
-                      property.listing?.price?.amount,
-                      property.listing?.price?.currency,
+                      property._listing?.price?.amount,
+                      property._listing?.price?.currency,
                     )}{" "}
                     -{" "}
                     <span
                       className={
-                        property.status === "published"
+                        property._status === "published"
                           ? "text-green-600"
                           : "text-orange-500"
                       }
                     >
-                      {property.status === "published"
+                      {property._status === "published"
                         ? "Publiée"
                         : "Brouillon"}
                     </span>

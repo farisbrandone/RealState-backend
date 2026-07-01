@@ -8,4 +8,6 @@ export const userApi = {
     httpClient.post(`/users/${userId}/avatar`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
+  upgradeToAgent: (userId: string) =>
+    httpClient.post(`/users/${userId}/upgrade-agent`),
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { useMutation } from "@tanstack/react-query";
 import { userApi } from "@/shared/api/endpoints/user.endpoints";
@@ -9,7 +9,12 @@ import { Button } from "@/shared/ui/components/Button/Button";
 import { Card } from "@/shared/ui/components/Card/Card";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { PhotoIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationTriangleIcon,
+  PhotoIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/24/outline";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
@@ -17,9 +22,28 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  console.log({ user });
+  const upgradeMode = searchParams.get("upgrade") === "agent";
+  const redirectTo =
+    searchParams.get("redirect") || "/dashboard/properties/new";
+
+  useEffect(() => {
+    if (upgradeMode) {
+      toast(
+        "Pour poster une annonce, vous devez devenir agent ou propriétaire.",
+        {
+          icon: "ℹ️",
+          duration: 5000,
+        },
+      );
+    }
+  }, [upgradeMode]);
 
   const { register, handleSubmit } = useForm({
-    defaultValues: {
+    // 🌟 Remplacer defaultValues par values pour synchroniser les inputs dès que 'user' change
+    values: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       phone: user?.phone || "",
@@ -35,6 +59,16 @@ export default function ProfilePage() {
       toast.success("Profil mis à jour");
     },
     onError: () => toast.error("Erreur lors de la mise à jour"),
+  });
+
+  const upgradeMutation = useMutation({
+    mutationFn: () => userApi.upgradeToAgent(user?.id!),
+    onSuccess: (res) => {
+      setUser({ ...user!, roles: res.data.roles });
+      toast.success("Vous êtes maintenant agent !");
+      router.push(redirectTo);
+    },
+    onError: () => toast.error("Erreur lors de la mise à jour du rôle"),
   });
 
   // Upload de l'avatar
@@ -54,9 +88,11 @@ export default function ProfilePage() {
       formData.append("file", file);
       // Endpoint à créer côté backend : POST /users/:id/avatar
       const response = await userApi.uploadAvatar(user?.id!, formData);
+      console.log(response.status);
       setUser({ ...user!, avatar: response.data.avatarUrl });
       toast.success("Photo de profil mise à jour");
-    } catch {
+    } catch (error) {
+      console.log(error);
       toast.error("Erreur lors de l'upload");
     } finally {
       setIsUploading(false);
@@ -64,11 +100,39 @@ export default function ProfilePage() {
   };
 
   const avatarUrl =
-    avatarPreview || user?.avatar || "/images/avatar-placeholder.png";
-
+    "http://localhost:3002" +
+    (avatarPreview || user?.avatar || "/images/avatar-placeholder.png");
+  console.log({ avatarUrl });
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-heading mb-6">Mon profil</h1>
+
+      {/* Bandeau upgrade */}
+      {upgradeMode && (
+        <Card className="mb-6 border-2 border-accent bg-accent/5">
+          <div className="flex items-start gap-4">
+            <ExclamationTriangleIcon className="h-6 w-6 text-accent flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-heading text-lg mb-2">
+                Devenez agent ou propriétaire
+              </h3>
+              <p className="text-sm text-primary-600 mb-4">
+                Pour publier des annonces, vous devez disposer d'un compte Agent
+                ou Propriétaire. Mettez à jour votre profil professionnel
+                ci-dessous puis cliquez sur "Devenir agent".
+              </p>
+              <Button
+                variant="primary"
+                onClick={() => upgradeMutation.mutate()}
+                disabled={upgradeMutation.isPending}
+              >
+                <ShieldCheckIcon className="h-4 w-4 mr-2" />
+                {upgradeMutation.isPending ? "Mise à jour..." : "Devenir agent"}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Avatar */}
       <Card className="mb-6">

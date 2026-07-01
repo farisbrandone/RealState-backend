@@ -20,6 +20,7 @@ import {
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
   BuildingStorefrontIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 
 export const Header = () => {
@@ -32,6 +33,27 @@ export const Header = () => {
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const handlePostProperty = () => {
+    if (!user) {
+      // Non connecté → rediriger vers login avec redirect
+      router.push("/login?redirect=/dashboard/properties/new");
+      return;
+    }
+    if (
+      user.roles.includes("USER") &&
+      !user.roles.includes("AGENT") &&
+      !user.roles.includes("OWNER")
+    ) {
+      // Utilisateur simple → rediriger vers la page de profil pour devenir agent
+      router.push(
+        "/dashboard/profile?upgrade=agent&redirect=/dashboard/properties/new",
+      );
+      return;
+    }
+    // Agent ou propriétaire → directement vers la création d'offre
+    router.push("/dashboard/properties/new");
+  };
 
   // Effet de scroll pour le header
   useEffect(() => {
@@ -121,6 +143,17 @@ export const Header = () => {
 
             {/* Actions droite */}
             <div className="flex items-center gap-2">
+              <button
+                onClick={handlePostProperty}
+                className={`flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  scrolled
+                    ? "bg-accent text-white hover:bg-accent-dark"
+                    : "bg-accent text-primary-900 hover:bg-accent-light"
+                }`}
+              >
+                <PlusIcon className="h-4 w-4" />
+                Poster une annonce
+              </button>
               {/* Bouton estimation */}
               <Link
                 href="/estimate"
@@ -163,7 +196,10 @@ export const Header = () => {
                       className="flex items-center gap-2 p-1 rounded-lg hover:bg-white/10 transition-colors"
                     >
                       <img
-                        src={user?.avatar || "/images/avatar-placeholder.png"}
+                        src={
+                          "http://localhost:3002" + user?.avatar ||
+                          "/images/avatar-placeholder.png"
+                        }
                         alt=""
                         className="w-8 h-8 rounded-full object-cover border-2 border-accent"
                       />
