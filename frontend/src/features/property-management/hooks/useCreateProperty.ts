@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { propertyManagementApi } from '@/shared/api/endpoints/property-management.endpoints';
-import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { propertyManagementApi } from "@/shared/api/endpoints/property-management.endpoints";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export const useCreateProperty = () => {
   const queryClient = useQueryClient();
@@ -11,13 +11,14 @@ export const useCreateProperty = () => {
 
   return useMutation({
     mutationFn: (data: any) => propertyManagementApi.create(data),
-    onSuccess: res => {
-      toast.success('Propriété créée avec succès');
-      queryClient.invalidateQueries({ queryKey: ['myProperties'] });
-      router.push(`/dashboard/properties/${res.data.id}/edit`); // ou liste
+    onSuccess: (res) => {
+      toast.success("Propriété créée avec succès");
+      queryClient.invalidateQueries({ queryKey: ["myProperties"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Erreur lors de la création');
+      toast.error(
+        error.response?.data?.message || "Erreur lors de la création",
+      );
     },
   });
 };

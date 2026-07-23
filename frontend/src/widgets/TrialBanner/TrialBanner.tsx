@@ -14,7 +14,7 @@ export const TrialBanner = () => {
   if (!trialEndsAt) return null;
 
   return (
-    <div className="bg-accent text-primary-900 text-center py-2 px-4 text-sm font-medium">
+    <div className="bg-accent text-ink text-center py-2 px-4 text-sm font-medium">
       Période d’essai : se termine{' '}
       {formatDistanceToNow(trialEndsAt, { addSuffix: true, locale: fr })}.
       <Link href="/pricing" className="underline ml-2">

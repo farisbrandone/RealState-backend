@@ -15,12 +15,14 @@ export const chatApi = {
   markAsRead: (conversationId: string, messageId: string) =>
     httpClient.post('/chat/messages/read', { conversationId, messageId }),
 
-  uploadAttachment: (conversationId: string, file: File) => {
+  uploadAttachment: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return httpClient.post(`/chat/attachments/upload/${conversationId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return httpClient.post<{ id: string; url: string; type: string }>(
+      '/chat/attachments',
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
   },
 
   startTyping: (conversationId: string) =>

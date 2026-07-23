@@ -3,10 +3,11 @@ export interface PropertyDetail {
   ownerId: string;
   title: string;
   description: string;
-  propertyType: string; // ⚠️ Ajouté
+  propertyType: string;
   address: {
     street: string;
     city: string;
+    neighborhood?: string; // ⬅️ ajouté — cohérent avec le reste de la plateforme
     postalCode: string;
     country: string;
     coordinates: {
@@ -67,10 +68,23 @@ export interface PropertyDetail {
     order: number;
     createdAt: string;
   }[];
-  floorPlans?: any[];
+  virtualTourUrl?: string | null;
+  floorPlanUrl?: string | null;
+  viewCount?: number;
+  inquiryCount?: number;
   chatSettings?: any;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
-  agent?: any;
+  agent?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string | null;
+    phone?: string | null;
+    email?: string;
+    company?: string | null;
+    averageRating?: number | null;
+    propertiesListed?: number;
+  } | null;
 }

@@ -1,6 +1,6 @@
 export interface GeoPoint {
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
 }
 
 export interface PropertyMapItem {
@@ -11,6 +11,8 @@ export interface PropertyMapItem {
   location: {
     address: string;
     city: string;
+    country: string;
+    neighborhood?: string;
     geoPoint: GeoPoint;
   };
   images: string[];

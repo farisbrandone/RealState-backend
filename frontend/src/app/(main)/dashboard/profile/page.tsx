@@ -15,6 +15,7 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getMediaUrl } from "@/shared/lib/media/media-url";
 
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
@@ -99,10 +100,11 @@ export default function ProfilePage() {
     }
   };
 
+  // avatarPreview est déjà une data: URL (FileReader) — ne jamais la préfixer.
   const avatarUrl =
-    "http://localhost:3002" +
-    (avatarPreview || user?.avatar || "/images/avatar-placeholder.png");
-  console.log({ avatarUrl });
+    avatarPreview ||
+    getMediaUrl(user?.avatar) ||
+    "/images/avatar-placeholder.png";
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-heading mb-6">Mon profil</h1>
@@ -146,7 +148,7 @@ export default function ProfilePage() {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 bg-accent text-white p-1.5 rounded-full hover:bg-accent-dark transition-colors"
+              className="absolute bottom-0 right-0 bg-accent text-ink p-1.5 rounded-full hover:bg-accent-dark transition-colors"
               title="Changer la photo"
             >
               <PhotoIcon className="h-4 w-4" />

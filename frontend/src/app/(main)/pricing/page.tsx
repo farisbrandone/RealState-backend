@@ -7,39 +7,7 @@ import { CheckIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { formatPrice } from '@/shared/lib/formatters/currency.formatter';
-
-const plans = [
-  {
-    id: 'plan_weekly',
-    name: 'Hebdomadaire',
-    price: 9.99,
-    currency: 'EUR',
-    interval: 'week',
-    features: ['Accès illimité', 'Messagerie', 'Notifications', 'Support standard'],
-  },
-  {
-    id: 'plan_monthly',
-    name: 'Mensuel',
-    price: 29.99,
-    currency: 'EUR',
-    interval: 'month',
-    features: [
-      'Accès illimité',
-      'Messagerie prioritaire',
-      'Statistiques avancées',
-      'Support prioritaire',
-    ],
-    popular: true,
-  },
-  {
-    id: 'plan_yearly',
-    name: 'Annuel',
-    price: 249.99,
-    currency: 'EUR',
-    interval: 'year',
-    features: ['Tout le plan mensuel', '2 mois offerts', 'Badge Premium', 'Support dédié'],
-  },
-];
+import { SUBSCRIPTION_PLANS as plans } from '@/shared/constants/subscription-plans.constants';
 
 export default function PricingPage() {
   const user = useAuthStore(s => s.user);
@@ -75,7 +43,7 @@ export default function PricingPage() {
             }`}
           >
             {plan.popular && (
-              <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-accent text-white px-3 py-1 rounded-full text-xs font-medium">
+              <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-accent text-ink px-3 py-1 rounded-full text-xs font-medium">
                 Populaire
               </span>
             )}

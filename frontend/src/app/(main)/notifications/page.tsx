@@ -4,6 +4,7 @@ import { useNotifications } from "@/features/notifications/hooks/useNotification
 import { useNotificationsStore } from "@/features/notifications/stores/notifications.store";
 import { Card } from "@/shared/ui/components/Card/Card";
 import { Button } from "@/shared/ui/components/Button/Button";
+import { EmptyState } from "@/shared/ui/components/EmptyState/EmptyState";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { BellIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
@@ -47,13 +48,15 @@ export default function NotificationsPage() {
 
       <div className="space-y-3">
         {filtered.length === 0 ? (
-          <Card className="text-center py-12">
-            <BellIcon className="h-12 w-12 text-primary-200 mx-auto mb-4" />
-            <p className="text-primary-500">
-              {filter === "unread"
-                ? "Aucune notification non lue"
-                : "Aucune notification"}
-            </p>
+          <Card>
+            <EmptyState
+              icon={<BellIcon className="h-8 w-8" />}
+              title={
+                filter === "unread"
+                  ? "Aucune notification non lue"
+                  : "Aucune notification"
+              }
+            />
           </Card>
         ) : (
           filtered.map((notif) => (

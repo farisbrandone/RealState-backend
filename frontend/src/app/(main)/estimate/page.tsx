@@ -41,11 +41,11 @@ export default function EstimatePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="bg-primary-900 py-16 px-4 text-center">
+      <section className="bg-ink py-16 px-4 text-center">
         <h1 className="text-4xl font-heading font-bold text-white mb-4">
           Estimez votre bien
         </h1>
-        <p className="text-primary-200 max-w-2xl mx-auto">
+        <p className="text-white/70 max-w-2xl mx-auto">
           Obtenez une estimation gratuite de votre bien immobilier en quelques
           clics
         </p>

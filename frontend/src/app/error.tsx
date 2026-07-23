@@ -1,6 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
+
 export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
@@ -9,7 +16,7 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
         <p className="text-primary-500 mb-8">{error.message}</p>
         <button
           onClick={reset}
-          className="bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-dark"
+          className="bg-accent text-ink px-6 py-3 rounded-lg hover:bg-accent-dark"
         >
           Réessayer
         </button>

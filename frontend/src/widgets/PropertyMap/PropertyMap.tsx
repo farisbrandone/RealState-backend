@@ -42,7 +42,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         attributionControl={false}
       >
         <Marker longitude={longitude} latitude={latitude}>
-          <div className="bg-accent text-white p-1 rounded-full shadow-lg">
+          <div className="bg-accent text-ink p-1 rounded-full shadow-lg">
             <MapPinIcon className="h-5 w-5" />
           </div>
         </Marker>
@@ -51,7 +51,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         href={`https://www.google.com/maps?q=${latitude},${longitude}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-2 right-2 bg-white text-xs px-2 py-1 rounded-lg shadow text-primary-600 hover:text-accent"
+        className="absolute bottom-2 right-2 bg-surface text-xs px-2 py-1 rounded-lg shadow text-primary-600 hover:text-accent"
       >
         Ouvrir dans Google Maps
       </a>

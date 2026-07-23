@@ -65,7 +65,7 @@ export const PropertyShare: React.FC<PropertyShareProps> = ({
       </button>
 
       {open && (
-        <div className="absolute bottom-full right-0 mb-2 bg-white shadow-card rounded-xl p-3 z-20 w-48">
+        <div className="absolute bottom-full right-0 mb-2 bg-surface shadow-card rounded-xl p-3 z-20 w-48">
           <div className="space-y-2">
             {shareLinks.map((link, idx) =>
               link.href ? (

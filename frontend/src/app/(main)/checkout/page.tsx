@@ -10,12 +10,7 @@ import { Input } from '@/shared/ui/components/Input/Input';
 import { useState } from 'react';
 import { formatPrice } from '@/shared/lib/formatters/currency.formatter';
 import { toast } from 'react-hot-toast';
-
-const PLAN_PRICES: Record<string, { amount: number; currency: string; name: string }> = {
-  plan_weekly: { amount: 9.99, currency: 'EUR', name: 'Hebdomadaire' },
-  plan_monthly: { amount: 29.99, currency: 'EUR', name: 'Mensuel' },
-  plan_yearly: { amount: 249.99, currency: 'EUR', name: 'Annuel' },
-};
+import { getSubscriptionPlan } from '@/shared/constants/subscription-plans.constants';
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
@@ -23,7 +18,7 @@ export default function CheckoutPage() {
   const user = useAuthStore(s => s.user);
   const router = useRouter();
 
-  const plan = PLAN_PRICES[planId] || PLAN_PRICES.plan_monthly;
+  const plan = getSubscriptionPlan(planId);
 
   const [paymentMethod, setPaymentMethod] = useState<
     'stripe' | 'orange_money' | 'mtn_money' | 'wave'
@@ -91,7 +86,7 @@ export default function CheckoutPage() {
         <div className="mb-6">
           <p className="text-lg">Plan {plan.name}</p>
           <p className="text-3xl font-heading text-accent">
-            {formatPrice(plan.amount, plan.currency)}
+            {formatPrice(plan.price, plan.currency)}
           </p>
         </div>
 
@@ -100,29 +95,35 @@ export default function CheckoutPage() {
             <label className="block text-sm font-medium mb-2">Mode de paiement</label>
             <div className="grid grid-cols-2 gap-3">
               <button
+                type="button"
                 onClick={() => setPaymentMethod('stripe')}
                 className={`p-3 rounded-lg border ${paymentMethod === 'stripe' ? 'border-accent bg-primary-50' : 'border-primary-200'}`}
               >
                 Carte bancaire
               </button>
-              <button
-                onClick={() => setPaymentMethod('orange_money')}
-                className={`p-3 rounded-lg border ${paymentMethod === 'orange_money' ? 'border-accent bg-primary-50' : 'border-primary-200'}`}
-              >
-                Orange Money
-              </button>
-              <button
-                onClick={() => setPaymentMethod('mtn_money')}
-                className={`p-3 rounded-lg border ${paymentMethod === 'mtn_money' ? 'border-accent bg-primary-50' : 'border-primary-200'}`}
-              >
-                MTN Money
-              </button>
-              <button
-                onClick={() => setPaymentMethod('wave')}
-                className={`p-3 rounded-lg border ${paymentMethod === 'wave' ? 'border-accent bg-primary-50' : 'border-primary-200'}`}
-              >
-                Wave
-              </button>
+              {/* Mobile money : intégrations opérateur pas encore branchées côté
+                  serveur — désactivé plutôt que de laisser un paiement en
+                  attente indéfiniment. */}
+              {(
+                [
+                  { key: 'orange_money', label: 'Orange Money' },
+                  { key: 'mtn_money', label: 'MTN Money' },
+                  { key: 'wave', label: 'Wave' },
+                ] as const
+              ).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  disabled
+                  title="Bientôt disponible"
+                  className="relative p-3 rounded-lg border border-primary-100 text-primary-400 cursor-not-allowed"
+                >
+                  {label}
+                  <span className="absolute right-2 top-2 rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-medium text-primary-500">
+                    Bientôt
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 

@@ -1,8 +1,16 @@
 import httpClient from '../clients/http.client';
 
+export interface OwnerStats {
+  totalProperties: number;
+  publishedProperties: number;
+  totalViews: number;
+  totalInquiries: number;
+}
+
 export const propertyManagementApi = {
   listMyProperties: (params?: any) => httpClient.get('/properties', { params }),
   getById: (id: string) => httpClient.get(`/properties/${id}`),
+  myStats: () => httpClient.get<OwnerStats>('/properties/mine/stats'),
   create: (data: any) => httpClient.post('/properties', data),
   update: (id: string, data: any) => httpClient.put(`/properties/${id}`, data),
   delete: (id: string) => httpClient.delete(`/properties/${id}`),

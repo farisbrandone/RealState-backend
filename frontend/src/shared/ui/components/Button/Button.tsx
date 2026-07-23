@@ -6,10 +6,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-accent text-primary-900 hover:bg-accent-dark',
+        // text-ink (jamais text-primary-900) : accent reste un or à peu près
+        // constant entre les thèmes, alors que primary-900 bascule au blanc
+        // en sombre — l'associer à accent rendrait le texte du bouton
+        // invisible en mode sombre. ink ne bascule jamais, donc le texte
+        // reste toujours foncé sur l'accent, dans les deux thèmes.
+        primary: 'bg-accent text-ink hover:bg-accent-dark',
         secondary: 'bg-primary-100 text-primary-900 hover:bg-primary-200',
-        outline: 'border border-primary-200 bg-transparent hover:bg-primary-50',
-        ghost: 'bg-transparent hover:bg-primary-50',
+        outline: 'border border-primary-200 bg-transparent text-primary-900 hover:bg-primary-50',
+        ghost: 'bg-transparent text-primary-900 hover:bg-primary-50',
       },
       size: {
         sm: 'h-9 px-3 text-sm',

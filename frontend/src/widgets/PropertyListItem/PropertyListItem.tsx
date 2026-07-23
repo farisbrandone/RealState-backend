@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { PropertySearchResult } from "@/features/property-search/types";
 import { formatPrice } from "@/shared/lib/formatters/currency.formatter";
+import { getMediaUrl } from "@/shared/lib/media/media-url";
+import { useFavoritesStore } from "@/features/favorites/stores/favorites.store";
 import { PROPERTY_TYPES } from "@/shared/constants/property.constants";
+import { FavoriteButton } from "@/shared/ui/components/FavoriteButton/FavoriteButton";
+import { formatLocation } from "@/shared/lib/formatters/location.formatter";
 import {
-  HeartIcon,
   MapPinIcon,
   ArrowsPointingOutIcon,
   HomeIcon,
   CalendarIcon,
 } from "@heroicons/react/24/outline";
-import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 
 interface PropertyListItemProps {
   property: PropertySearchResult;
@@ -19,7 +21,8 @@ interface PropertyListItemProps {
 export const PropertyListItem: React.FC<PropertyListItemProps> = ({
   property,
 }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const isFavorite = useFavoritesStore((s) => s.isFavorite(property.id));
+  const toggleFavorite = useFavoritesStore((s) => s.toggleFavorite);
   const typeLabel =
     PROPERTY_TYPES.find((t) => t.value === property.propertyType)?.label ||
     property.propertyType;
@@ -32,11 +35,14 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
         className="relative md:w-80 aspect-[4/3] md:aspect-auto overflow-hidden shrink-0"
       >
         <img
-          src={property.images?.[0] || "/images/property-placeholder.jpg"}
+          src={
+            getMediaUrl(property.images?.[0]) ||
+            "/images/property-placeholder.jpg"
+          }
           alt={property.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <span className="absolute top-3 left-3 bg-accent text-white text-xs font-bold px-2 py-1 rounded-full">
+        <span className="absolute top-3 left-3 bg-accent text-ink text-xs font-bold px-2 py-1 rounded-full">
           {property.transactionType === "sale" ? "À vendre" : "À louer"}
         </span>
       </Link>
@@ -53,16 +59,12 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
                 <span className="text-sm text-primary-400"> / mois</span>
               )}
             </div>
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
+            <FavoriteButton
+              isFavorite={isFavorite}
+              onToggle={() => toggleFavorite(property)}
+              iconClassName="h-6 w-6"
               className="p-2 hover:bg-primary-50 rounded-full transition-colors"
-            >
-              {isFavorite ? (
-                <HeartSolid className="h-6 w-6 text-red-500" />
-              ) : (
-                <HeartIcon className="h-6 w-6 text-primary-400" />
-              )}
-            </button>
+            />
           </div>
 
           <Link href={`/properties/${property.id}`}>
@@ -77,7 +79,11 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
             </span>
             <span className="flex items-center gap-1">
               <MapPinIcon className="h-4 w-4" />
-              {property.location?.city}, {property.location?.country}
+              {formatLocation({
+                neighborhood: property.location?.neighborhood,
+                city: property.location?.city,
+                country: property.location?.country,
+              })}
             </span>
           </div>
 

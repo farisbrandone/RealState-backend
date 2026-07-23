@@ -1,14 +1,68 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "./animations.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');*/
+/* Playfair Display et Inter sont chargées via next/font/google dans
+   src/app/layout.tsx (voir les variables --font-playfair/--font-inter
+   référencées dans tailwind.config.ts) — plus d'@import bloquant ici. */
+
+/* Jetons de couleur (canaux "R G B" sans virgule, pour rgb(var(..) / <alpha>)
+   dans tailwind.config.ts). La palette .dark n'est pas une simple inversion :
+   l'échelle primary est reflétée (50↔900) pour que bg-primary-100 reste un
+   fond clair-sur-sombre cohérent et text-primary-900 reste le texte le plus
+   contrasté, sans qu'aucun composant n'ait à changer de classe. */
+:root {
+  --color-primary-50: 248 250 252;
+  --color-primary-100: 241 245 249;
+  --color-primary-200: 226 232 240;
+  --color-primary-300: 203 213 225;
+  --color-primary-400: 148 163 184;
+  --color-primary-500: 100 116 139;
+  --color-primary-600: 71 85 105;
+  --color-primary-700: 51 65 85;
+  --color-primary-800: 30 41 59;
+  --color-primary-900: 15 23 42;
+
+  --color-accent: 212 175 55;
+  --color-accent-light: 240 230 140;
+  --color-accent-dark: 184 150 12;
+
+  --color-surface: 255 255 255;
+  --color-background: 248 250 252;
+
+  /* "Ink" : bandeau de marque toujours sombre (héros, header flottant,
+     footer, sidebar dashboard...), volontairement IDENTIQUE en clair et en
+     sombre. Contrairement à primary-900 (reflété par thème), ink ne bascule
+     jamais — donc le texte blanc/clair posé dessus (text-white,
+     text-white/70) reste lisible quel que soit le thème actif. */
+  --color-ink: 15 23 42;
+  --color-ink-elevated: 30 41 59;
+}
+
+.dark {
+  --color-primary-50: 15 23 42;
+  --color-primary-100: 30 41 59;
+  --color-primary-200: 51 65 85;
+  --color-primary-300: 71 85 105;
+  --color-primary-400: 100 116 139;
+  --color-primary-500: 148 163 184;
+  --color-primary-600: 203 213 225;
+  --color-primary-700: 226 232 240;
+  --color-primary-800: 241 245 249;
+  --color-primary-900: 248 250 252;
+
+  --color-accent: 216 184 84;
+  --color-accent-light: 240 230 140;
+  --color-accent-dark: 184 150 12;
+
+  --color-surface: 26 35 51;
+  --color-background: 11 18 32;
+}
 
 @layer base {
   body {
-    @apply font-body text-primary-900 bg-background;
+    @apply font-body text-primary-900 bg-background transition-colors duration-200;
   }
 
   h1,

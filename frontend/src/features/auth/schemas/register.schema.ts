@@ -22,7 +22,12 @@ const ROLES = ["user", "agent", "owner"] as const;
 export const registerStep2Schema = z.object({
   firstName: z.string().min(2, "Minimum 2 caractères"),
   lastName: z.string().min(2, "Minimum 2 caractères"),
-  phone: z.string().regex(/^\+?[0-9]{7,15}$/, "Numéro invalide"),
+  countryCode: z.string().min(1, "Veuillez choisir un pays"),
+  // Numéro local uniquement (sans l'indicatif, sans le 0 initial), 6 à 12 chiffres
+  phone: z
+    .string()
+    .min(1, "Numéro requis")
+    .regex(/^[0-9\s]{6,12}$/, "Numéro invalide"),
   role: z
     .string({ error: "Veuillez choisir un type de compte" })
     .refine((val) => ROLES.includes(val as any), {

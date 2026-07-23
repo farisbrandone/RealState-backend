@@ -39,8 +39,11 @@ export const NotificationBell = ({
   return (
     <div ref={ref} className="relative">
       <button
+        type="button"
         onClick={() => setOpen(!open)}
-        className={`relative p-1 ${scrolled ? "text-primary-500" : "text-primary-200"} hover:text-white transition-colors`}
+        aria-label="Notifications"
+        aria-expanded={open}
+        className={`relative p-1 ${scrolled ? "text-primary-500" : "text-white/70"} hover:text-white transition-colors`}
       >
         <BellIcon className="h-6 w-6" />
         {totalUnread > 0 && (
@@ -49,8 +52,8 @@ export const NotificationBell = ({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-card overflow-hidden z-50">
-          <div className="p-3 border-b flex justify-between items-center">
+        <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-1.5rem)] bg-surface rounded-xl shadow-card overflow-hidden z-50">
+          <div className="p-3 border-b border-primary-100 flex justify-between items-center">
             <h3 className="font-heading">Notifications</h3>
             <Link
               href="/notifications"

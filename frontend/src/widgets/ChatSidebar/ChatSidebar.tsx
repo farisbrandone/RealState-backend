@@ -37,7 +37,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
     }) || [];
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-surface">
       {/* En-tête */}
       <div className="p-4 border-b border-primary-100">
         <div className="flex items-center justify-between mb-3">

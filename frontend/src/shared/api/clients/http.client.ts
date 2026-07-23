@@ -5,19 +5,25 @@ import axios, {
   AxiosError,
 } from "axios";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
+import * as qs from "qs"; // 1. Importe qs
 
-const API_GATEWAY_URL =
+export const API_GATEWAY_URL =
   process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:3002/api/v1";
 
 const httpClient: AxiosInstance = axios.create({
   baseURL: API_GATEWAY_URL,
   timeout: 10000,
+  // 2. Ajoute ce sérialiseur personnalisé ici :
+  paramsSerializer: {
+    serialize: (params) =>
+      qs.stringify(params, { arrayFormat: "brackets", allowDots: true }),
+  },
 });
 
 httpClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().accessToken;
-    console.log({ token });
+
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }

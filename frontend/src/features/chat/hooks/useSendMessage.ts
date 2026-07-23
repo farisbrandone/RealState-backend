@@ -10,6 +10,7 @@ export const useSendMessage = () => {
       content: string;
       type?: 'TEXT' | 'IMAGE' | 'FILE';
       replyToId?: string;
+      attachments?: { id: string; url: string; type: string }[];
     }) => chatApi.sendMessage(payload),
   });
 };

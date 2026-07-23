@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Lightbox } from "./Lightbox";
+import { getMediaUrl } from "@/shared/lib/media/media-url";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -19,12 +20,20 @@ interface Media {
 
 interface PropertyGalleryProps {
   images: Media[];
+  title?: string;
 }
 
-export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
+export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images, title = "Photo" }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const sorted = [...images].sort((a, b) => (a.isMain ? -1 : b.isMain ? 1 : 0));
+  // URL résolue une seule fois ici : Lightbox et les miniatures n'ont plus à
+  // connaître la logique de construction d'URL média.
+  const sorted = [...images]
+    .sort((a, b) => (a.isMain ? -1 : b.isMain ? 1 : 0))
+    .map((m) => ({
+      ...m,
+      url: getMediaUrl(m.url) || "/images/property-placeholder.jpg",
+    }));
 
   if (sorted.length === 0) {
     return (
@@ -49,17 +58,22 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
   return (
     <div className="space-y-2">
       {/* Image principale */}
-      <div
-        className="relative aspect-[16/9] rounded-xl overflow-hidden cursor-pointer"
-        onClick={() => openLightbox(currentIndex)}
-      >
-        <img
-          src={sorted[currentIndex]?.url || "/images/property-placeholder.jpg"}
-          alt={`Photo ${currentIndex + 1}`}
-          className="w-full h-full object-cover"
-        />
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+        <button
+          type="button"
+          onClick={() => openLightbox(currentIndex)}
+          aria-label={`Agrandir la photo ${currentIndex + 1} sur ${sorted.length}`}
+          className="absolute inset-0 h-full w-full cursor-pointer text-left"
+        >
+          <img
+            src={sorted[currentIndex]?.url}
+            alt={`${title} — photo ${currentIndex + 1}`}
+            className="h-full w-full object-cover"
+          />
+        </button>
+
         {/* Compteur */}
-        <div className="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+        <div className="pointer-events-none absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
           {currentIndex + 1} / {sorted.length}
         </div>
 
@@ -67,20 +81,18 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
         {sorted.length > 1 && (
           <>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                goPrev();
-              }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              type="button"
+              onClick={goPrev}
+              aria-label="Photo précédente"
+              className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-colors focus-visible:ring-2 focus-visible:ring-white"
             >
               <ChevronLeftIcon className="h-5 w-5" />
             </button>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                goNext();
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              type="button"
+              onClick={goNext}
+              aria-label="Photo suivante"
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-colors focus-visible:ring-2 focus-visible:ring-white"
             >
               <ChevronRightIcon className="h-5 w-5" />
             </button>
@@ -89,7 +101,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
 
         {/* Badge vidéo si présence */}
         {sorted.some((m) => m.type === "video") && (
-          <div className="absolute top-3 right-3 bg-accent text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+          <div className="pointer-events-none absolute top-3 right-3 bg-accent text-ink text-xs px-2 py-1 rounded-full flex items-center gap-1">
             <PlayIcon className="h-3 w-3" />
             Vidéo
           </div>
@@ -102,8 +114,11 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
           {sorted.map((media, idx) => (
             <button
               key={media.id}
+              type="button"
               onClick={() => setCurrentIndex(idx)}
-              className={`relative w-20 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
+              aria-label={`Voir la photo ${idx + 1}`}
+              aria-current={idx === currentIndex}
+              className={`relative w-20 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all focus-visible:ring-2 focus-visible:ring-accent ${
                 idx === currentIndex
                   ? "border-accent"
                   : "border-transparent opacity-60 hover:opacity-100"
@@ -111,7 +126,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
             >
               <img
                 src={media.url}
-                alt={`Miniature ${idx + 1}`}
+                alt=""
                 className="w-full h-full object-cover"
               />
               {media.type === "video" && (
@@ -129,6 +144,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ images }) => {
         <Lightbox
           images={sorted}
           currentIndex={currentIndex}
+          altBase={title}
           onClose={closeLightbox}
           onPrev={goPrev}
           onNext={goNext}

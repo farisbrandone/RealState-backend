@@ -8,6 +8,7 @@ import {
   AMENITIES,
   EXTRA_FEATURES,
 } from "@/shared/constants/property.constants";
+import { propertyApi } from "@/shared/api/endpoints/property.endpoints";
 
 export const FiltersPanel = () => {
   const filters = useSearchStore((s) => s.filters);
@@ -31,19 +32,18 @@ export const FiltersPanel = () => {
   const handleApplyFilters = () => {
     setFilters({
       ...filters,
+      transactionType: filters.transactionType,
       propertyType: selectedTypes.length > 0 ? selectedTypes : undefined,
       priceRange: {
         min: priceMin,
         max: priceMax,
-        currency: "EUR",
+        currency: "XAF",
       },
       features: {
         ...filters.features,
         bedrooms: bedrooms,
-        squareMeters:
-          surfaceMin || surfaceMax
-            ? { min: surfaceMin, max: surfaceMax }
-            : undefined,
+        squareMetersMin: surfaceMin,
+        squareMetersMax: surfaceMax,
         ...Object.fromEntries(selectedAmenities.map((a) => [a, true])),
         ...Object.fromEntries(selectedExtras.map((e) => [e, true])),
       },
@@ -93,7 +93,7 @@ export const FiltersPanel = () => {
 
       {/* Prix */}
       <div>
-        <h3 className="font-medium text-primary-900 mb-3">Prix (€)</h3>
+        <h3 className="font-medium text-primary-900 mb-3">Prix (FCFA)</h3>
         <div className="grid grid-cols-2 gap-2">
           <input
             type="number"

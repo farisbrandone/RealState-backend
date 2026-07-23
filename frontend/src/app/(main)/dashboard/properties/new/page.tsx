@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { PropertyForm } from "@/widgets/PropertyForm/PropertyForm";
 import { useCreateProperty } from "@/features/property-management/hooks/useCreateProperty";
 import { propertyManagementApi } from "@/shared/api/endpoints/property-management.endpoints";
@@ -9,48 +10,77 @@ import { toast } from "react-hot-toast";
 export default function NewPropertyPage() {
   const createMutation = useCreateProperty();
   const router = useRouter();
+  const [uploadProgress, setUploadProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
 
   const handleSubmit = async (data: any) => {
-    const { files, ...propertyData } = data;
+    const { files, mainFileIndex, removedMediaIds, ...propertyData } = data;
 
     try {
-      // 1. Créer la propriété
-
       const response = await createMutation.mutateAsync(propertyData);
-      const propertyId = response.data.id; // Le backend doit renvoyer l'ID de la propriété créée
+      const propertyId = response.data.id;
 
-      // 2. Uploader les fichiers un par un
       if (files && files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-          const isMain = i === 0; // La première image est principale
+        setUploadProgress({ done: 0, total: files.length });
 
-          const result = await propertyManagementApi.uploadMedia(
-            propertyId,
-            files[i],
-            isMain,
-          );
-          console.log({ titi: result.data });
-        }
+        // Upload en parallèle (plus rapide) tout en gardant la progression visible
+        await Promise.all(
+          files.map(async (file: File, i: number) => {
+            try {
+              await propertyManagementApi.uploadMedia(
+                propertyId,
+                file,
+                i === mainFileIndex,
+              );
+            } finally {
+              setUploadProgress((prev) =>
+                prev ? { ...prev, done: prev.done + 1 } : prev,
+              );
+            }
+          }),
+        );
       }
 
       toast.success("Propriété créée avec succès !");
-      //router.push("/dashboard/properties");
+      router.push("/dashboard/properties");
     } catch (error: any) {
-      console.log(error.response?.data?.message);
       toast.error(
         error.response?.data?.message || "Erreur lors de la création",
       );
+    } finally {
+      setUploadProgress(null);
     }
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-heading mb-6">Nouveau bien</h1>
+      <h1 className="mb-6 font-heading text-2xl">Nouveau bien</h1>
+
       <PropertyForm
         onSubmit={handleSubmit}
-        isSubmitting={createMutation.isPending}
+        isSubmitting={createMutation.isPending || !!uploadProgress}
         submitLabel="Créer le bien"
       />
+
+      {uploadProgress && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-80 max-w-[90vw] rounded-2xl bg-surface p-6 shadow-2xl">
+            <p className="mb-3 text-center font-heading text-primary-900">
+              Envoi des photos ({uploadProgress.done}/{uploadProgress.total})
+            </p>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-primary-100">
+              <div
+                className="h-full rounded-full bg-accent transition-all duration-300"
+                style={{
+                  width: `${(uploadProgress.done / uploadProgress.total) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

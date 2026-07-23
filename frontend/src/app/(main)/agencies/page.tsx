@@ -32,12 +32,12 @@ export default function AgenciesPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="bg-primary-900 py-16 px-4">
+      <section className="bg-ink py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl font-heading font-bold text-white mb-4">
             Agences partenaires
           </h1>
-          <p className="text-primary-200 mb-8">
+          <p className="text-white/70 mb-8">
             Découvrez notre réseau d'agences immobilières en Afrique francophone
           </p>
           <div className="max-w-xl mx-auto">
@@ -46,7 +46,7 @@ export default function AgenciesPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              className="bg-white"
+              className="bg-surface"
             />
           </div>
         </div>

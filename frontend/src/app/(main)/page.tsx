@@ -16,8 +16,12 @@ import {
   HomeModernIcon,
   StarIcon,
   ArrowTrendingUpIcon,
+  ClockIcon,
+  ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import { formatPrice } from "@/shared/lib/formatters/currency.formatter";
+import { CalendarIcon } from "lucide-react";
+import { blogPosts } from "@/shared/data/blog-posts";
 
 const DynamicMapContainer = dynamic(
   () =>
@@ -26,7 +30,7 @@ const DynamicMapContainer = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-[70vh] w-full absolute inset-0" />,
+    loading: () => <Skeleton className="h-full w-full absolute inset-0" />,
   },
 );
 
@@ -45,123 +49,134 @@ export default function HomePage() {
   const viewMode = useSearchStore((s) => s.viewMode);
 
   const stats = [
-    { label: "Biens disponibles", value: 12450, icon: HomeModernIcon },
-    { label: "Agences partenaires", value: 342, icon: BuildingOfficeIcon },
-    { label: "Agents experts", value: 1580, icon: StarIcon },
+    { label: "Biens disponibles", value: "12 450", icon: HomeModernIcon },
+    { label: "Agences partenaires", value: "342", icon: BuildingOfficeIcon },
+    { label: "Agents experts", value: "1 580", icon: StarIcon },
     { label: "Prix moyen/m²", value: "85 000 FCFA", icon: ArrowTrendingUpIcon },
+  ];
+
+  const heroCtas = [
+    { href: "/buy", label: "Acheter", icon: MagnifyingGlassIcon },
+    { href: "/rent", label: "Louer", icon: MagnifyingGlassIcon },
+    { href: "/estimate", label: "Estimer mon bien", icon: null },
   ];
 
   return (
     <div className="min-h-screen">
-      {/* SECTION HERO AVEC CARTE PLEIN ÉCRAN */}
-      <section className="relative h-[85vh] min-h-[600px] bg-primary-900 overflow-hidden">
-        <div className="absolute inset-0">
+      {/* ============ SECTION HERO ============ */}
+      {/*
+        Fix clé : plus de hauteur figée (h-[85vh]) combinée à overflow-hidden
+        sur toute la section. Le fond carte est cadré indépendamment (inset-0
+        + overflow-hidden UNIQUEMENT sur ce calque), tandis que la section
+        elle-même utilise min-h-* et grandit avec son contenu. Ainsi, quel que
+        soit le texte affiché sur mobile, rien n'est jamais rogné.
+      */}
+      <section className="relative min-h-[620px] sm:min-h-[700px] lg:min-h-[760px] bg-ink">
+        {/* Fond carte, cadré */}
+        <div className="absolute inset-0 overflow-hidden">
           <DynamicMapContainer className="h-full w-full">
             <DynamicMapMarkers properties={properties.slice(0, 20)} />
           </DynamicMapContainer>
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+        {/* Overlays de lisibilité */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/25 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/20 lg:hidden pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col items-center justify-end h-full pb-16 px-4">
-          <div className="text-center max-w-4xl mb-8">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-4 leading-tight">
+        {/* Contenu — flux naturel, jamais tronqué. Centré verticalement
+            (plutôt que justify-end) : avec justify-end, le pt-24 ne servait
+            à rien puisque le contenu était de toute façon plaqué en bas,
+            créant un grand vide entre le header et le titre. */}
+        <div className="relative z-10 flex min-h-[620px] sm:min-h-[700px] lg:min-h-[760px] flex-col justify-center px-4 py-16 sm:py-20 lg:py-24">
+          <div className="mx-auto w-full max-w-4xl text-center">
+            <h1 className="mb-3 font-heading font-bold leading-[1.08] text-white text-[clamp(2rem,7vw,4.5rem)] sm:mb-4">
               Trouvez le bien
               <span className="block text-accent">qui vous correspond</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8">
+            <p className="mx-auto mb-6 max-w-2xl px-2 text-sm text-white/80 sm:mb-8 sm:text-base md:text-lg lg:text-xl">
               Appartements, studios, chambres, boutiques, terrains… Explorez
               notre sélection diversifiée de biens immobiliers partout en
               Afrique francophone.
             </p>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="mx-auto max-w-4xl">
               <SearchBar />
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4 mt-6">
-              <Link href="/buy">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20"
+            <div className="mx-auto mt-5 grid max-w-lg grid-cols-2 gap-2 sm:mt-6 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-4">
+              {heroCtas.map((cta, i) => (
+                <Link
+                  key={cta.href}
+                  href={cta.href}
+                  className={i === 2 ? "col-span-2 sm:col-span-1" : ""}
                 >
-                  <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
-                  Acheter
-                </Button>
-              </Link>
-              <Link href="/rent">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20"
-                >
-                  <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
-                  Louer
-                </Button>
-              </Link>
-              <Link href="/estimate">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20"
-                >
-                  Estimer mon bien
-                </Button>
-              </Link>
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    className="w-full border border-white/20 bg-white/10 px-3 py-2.5 text-xs text-white backdrop-blur-md hover:bg-white/20 sm:w-auto sm:px-6 sm:py-3 sm:text-base"
+                  >
+                    {cta.icon && (
+                      <cta.icon className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
+                    )}
+                    {cta.label}
+                  </Button>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-            <div className="w-1.5 h-1.5 bg-white/60 rounded-full" />
+        <div className="absolute bottom-4 left-1/2 z-10 hidden -translate-x-1/2 animate-bounce sm:flex">
+          <div className="flex h-10 w-6 justify-center rounded-full border-2 border-white/30 pt-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
           </div>
         </div>
       </section>
 
-      {/* SECTION STATISTIQUES */}
-      <section className="relative -mt-12 z-20 max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ============ SECTION STATISTIQUES ============ */}
+      <section className="relative z-20 mx-auto -mt-10 max-w-7xl px-4 sm:-mt-12">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-surface rounded-xl shadow-card p-6 flex items-center gap-4 hover:shadow-soft transition-shadow"
+              className="flex items-center gap-3 rounded-xl bg-surface p-4 shadow-card transition-shadow hover:shadow-soft sm:gap-4 sm:p-6"
             >
-              <div className="bg-accent/10 p-3 rounded-lg">
-                <stat.icon className="h-6 w-6 text-accent" />
+              <div className="shrink-0 rounded-lg bg-accent/10 p-2.5 sm:p-3">
+                <stat.icon className="h-5 w-5 text-accent sm:h-6 sm:w-6" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-primary-900">
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold text-primary-900 sm:text-2xl">
                   {stat.value}
                 </p>
-                <p className="text-sm text-primary-500">{stat.label}</p>
+                <p className="truncate text-[11px] leading-snug text-primary-500 sm:text-sm">
+                  {stat.label}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* SECTION BIOGRAPHIE LUXHORIZON */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* ============ SECTION BIOGRAPHIE LUXHORIZON ============ */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-heading mb-6">
+            <h2 className="mb-4 font-heading text-2xl sm:text-3xl md:text-4xl sm:mb-6">
               LuxHorizon, votre partenaire
               <span className="text-accent"> immobilier en Afrique</span>
             </h2>
-            <p className="text-primary-600 mb-4 leading-relaxed">
+            <p className="mb-4 leading-relaxed text-primary-600">
               LuxHorizon connecte acheteurs, locataires et propriétaires à
               travers une plateforme moderne et accessible. Notre présence
               couvre plusieurs pays d'Afrique francophone pour vous offrir un
               large choix de biens adaptés à tous les besoins.
             </p>
-            <p className="text-primary-600 mb-6 leading-relaxed">
+            <p className="mb-6 leading-relaxed text-primary-600">
               Avec des milliers de biens référencés, des agences partenaires
               locales et des agents experts de votre région, nous simplifions
               votre recherche immobilière.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <Link href="/agencies">
                 <Button variant="outline" size="md">
                   Voir les agences
@@ -174,22 +189,23 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="relative">
-            <div className="aspect-[4/3] rounded-xl overflow-hidden shadow-soft">
+          <div className="relative px-2 sm:px-0">
+            <div className="aspect-[4/3] overflow-hidden rounded-xl shadow-soft">
               <img
-                src="/images/property-africa.jpg"
+                src="/images/property-africa.png"
                 alt="Propriété en Afrique"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
+                loading="lazy"
               />
             </div>
-            <div className="absolute -bottom-6 -left-6 bg-surface rounded-xl shadow-card p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                  <StarIcon className="h-6 w-6 text-accent" />
+            <div className="absolute -bottom-4 -left-2 rounded-xl bg-surface p-3 shadow-card sm:-bottom-6 sm:-left-6 sm:p-4">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 sm:h-12 sm:w-12">
+                  <StarIcon className="h-5 w-5 text-accent sm:h-6 sm:w-6" />
                 </div>
                 <div>
-                  <p className="font-bold text-lg">4.8/5</p>
-                  <p className="text-sm text-primary-500">
+                  <p className="text-base font-bold sm:text-lg">4.8/5</p>
+                  <p className="text-xs text-primary-500 sm:text-sm">
                     Satisfaction client
                   </p>
                 </div>
@@ -199,17 +215,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION BIENS VEDETTES */}
-      <section className="bg-primary-50 py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
+      {/* ============ SECTION BIENS VEDETTES ============ */}
+      <section className="bg-primary-50 py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-3xl font-heading mb-2">Biens à la une</h2>
-              <p className="text-primary-500">
+              <h2 className="mb-1.5 font-heading text-2xl sm:mb-2 sm:text-3xl">
+                Biens à la une
+              </h2>
+              <p className="text-sm text-primary-500 sm:text-base">
                 Notre sélection de biens populaires
               </p>
             </div>
-            <Link href="/search">
+            <Link href="/search" className="self-start sm:self-auto">
               <Button variant="outline" size="md">
                 Voir tous les biens
               </Button>
@@ -217,13 +235,16 @@ export default function HomePage() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-[400px] rounded-xl" />
+                <Skeleton
+                  key={i}
+                  className="h-[380px] rounded-xl sm:h-[400px]"
+                />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {properties.slice(0, 6).map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
@@ -232,12 +253,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION SERVICES */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-heading text-center mb-12">
+      {/* ============ SECTION SERVICES ============ */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16">
+        <h2 className="mb-10 text-center font-heading text-2xl sm:mb-12 sm:text-3xl">
           Nos <span className="text-accent">services</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3">
           {[
             {
               title: "Estimation en ligne",
@@ -262,75 +283,77 @@ export default function HomePage() {
             },
           ].map((service, index) => (
             <Link key={index} href={service.href} className="group">
-              <div className="bg-surface rounded-xl shadow-card p-8 text-center hover:shadow-soft transition-all transform hover:-translate-y-1">
-                <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 transition-colors">
-                  <service.icon className="h-8 w-8 text-accent" />
+              <div className="transform rounded-xl bg-surface p-6 text-center shadow-card transition-all hover:-translate-y-1 hover:shadow-soft sm:p-8">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 transition-colors group-hover:bg-accent/20 sm:h-16 sm:w-16">
+                  <service.icon className="h-7 w-7 text-accent sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="text-xl font-heading mb-2">{service.title}</h3>
-                <p className="text-primary-500">{service.description}</p>
+                <h3 className="mb-2 font-heading text-lg sm:text-xl">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-primary-500 sm:text-base">
+                  {service.description}
+                </p>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* SECTION BLOG (aperçu) */}
-      <section className="bg-primary-50 py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-heading">Actualités immobilières</h2>
+      {/* ============ SECTION BLOG (aperçu) ============ */}
+      <section className="bg-primary-50 py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="font-heading text-2xl sm:text-3xl">
+              Actualités immobilières
+            </h2>
             <Link href="/blog">
               <Button variant="outline" size="md">
                 Lire le blog
               </Button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Les tendances du marché en 2025",
-                excerpt:
-                  "Découvrez les prévisions pour le marché immobilier en Afrique.",
-                date: "15 Jan 2025",
-                image: "/images/blog-1.jpg",
-              },
-              {
-                title: "Investir dans l'immobilier locatif",
-                excerpt: "Les clés pour réussir votre investissement locatif.",
-                date: "10 Jan 2025",
-                image: "/images/blog-2.jpg",
-              },
-              {
-                title: "Guide : acheter à l'étranger",
-                excerpt:
-                  "Tout ce qu'il faut savoir avant d'acheter un bien à l'étranger.",
-                date: "5 Jan 2025",
-                image: "/images/blog-3.jpg",
-              },
-            ].map((article, index) => (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            {blogPosts.slice(0, 3).map((post) => (
               <Link
-                key={index}
-                href={`/blog/${article.title.toLowerCase().replace(/\s+/g, "-")}`}
+                key={post.slug}
+                href={`/blog/${post.slug}`}
                 className="group"
               >
-                <div className="bg-surface rounded-xl shadow-card overflow-hidden hover:shadow-soft transition-all">
-                  <div className="aspect-[16/9] bg-primary-200">
+                <div className="flex h-full flex-col overflow-hidden rounded-xl bg-surface shadow-card transition-all hover:shadow-soft">
+                  <div className="relative aspect-[16/9] overflow-hidden">
                     <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
+                      src={
+                        post.coverImage ||
+                        `https://picsum.photos/seed/${post.slug}/600/400`
+                      }
+                      alt={post.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
                     />
+                    <div className="absolute left-3 top-3 rounded-full bg-accent px-2 py-1 text-xs text-ink">
+                      {post.category}
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <p className="text-sm text-primary-400 mb-2">
-                      {article.date}
-                    </p>
-                    <h3 className="font-heading text-lg mb-2 group-hover:text-accent transition-colors">
-                      {article.title}
+                  <div className="flex flex-1 flex-col p-4 sm:p-5">
+                    <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-primary-400">
+                      <span className="flex items-center gap-1">
+                        <CalendarIcon className="h-3 w-3" />
+                        {new Date(post.date).toLocaleDateString("fr-FR", {
+                          day: "numeric",
+                          month: "long",
+                        })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <ClockIcon className="h-3 w-3" />
+                        {post.readTime}
+                      </span>
+                    </div>
+                    <h3 className="mb-2 line-clamp-2 flex-1 font-heading text-base transition-colors group-hover:text-accent">
+                      {post.title}
                     </h3>
-                    <p className="text-primary-500 text-sm">
-                      {article.excerpt}
-                    </p>
+                    <span className="mt-2 flex items-center gap-1 text-sm font-medium text-accent">
+                      Lire <ArrowRightIcon className="h-3 w-3" />
+                    </span>
                   </div>
                 </div>
               </Link>
@@ -339,19 +362,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION CONTACT / CTA */}
-      <section className="bg-primary-900 py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-heading text-white mb-4">
+      {/* ============ SECTION CONTACT / CTA ============ */}
+      <section className="bg-ink py-12 sm:py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <h2 className="mb-4 font-heading text-2xl text-white sm:text-3xl md:text-4xl">
             Prêt à trouver votre bien ?
           </h2>
-          <p className="text-primary-200 mb-8 max-w-2xl mx-auto">
+          <p className="mx-auto mb-8 max-w-2xl text-sm text-white/70 sm:text-base">
             Nos experts locaux sont à votre disposition pour vous accompagner
             dans votre projet immobilier.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
             <Link href="/contact">
-              <Button variant="primary" size="lg">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto">
                 Nous contacter
               </Button>
             </Link>
@@ -359,7 +382,7 @@ export default function HomePage() {
               <Button
                 variant="secondary"
                 size="lg"
-                className="bg-white/10 text-white border border-white/20 hover:bg-white/20"
+                className="w-full border border-white/20 bg-white/10 text-white hover:bg-white/20 sm:w-auto"
               >
                 Estimation gratuite
               </Button>

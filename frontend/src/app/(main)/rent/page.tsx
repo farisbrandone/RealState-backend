@@ -33,12 +33,12 @@ export default function RentPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-primary-900 py-16 px-4">
+      <section className="bg-ink py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl font-heading font-bold text-white mb-4">
             Louez le bien qui vous correspond
           </h1>
-          <p className="text-primary-200 mb-8">
+          <p className="text-white/70 mb-8">
             Découvrez notre sélection de biens à louer partout en Afrique
             francophone
           </p>

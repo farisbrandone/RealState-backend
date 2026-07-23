@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withPWA = withPWAInit({
   dest: "public",
@@ -34,4 +35,15 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+// Sans SENTRY_AUTH_TOKEN (ex : en local ou en CI sans compte Sentry
+// configuré), le plugin désactive silencieusement l'upload des source maps
+// plutôt que d'échouer le build.
+export default withSentryConfig(withPWA(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  widenClientFileUpload: false,
+  sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
+  webpack: { treeshake: { removeDebugLogging: true } },
+});

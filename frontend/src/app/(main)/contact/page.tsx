@@ -34,11 +34,11 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="bg-primary-900 py-16 px-4 text-center">
+      <section className="bg-ink py-16 px-4 text-center">
         <h1 className="text-4xl font-heading font-bold text-white mb-4">
           Contactez-nous
         </h1>
-        <p className="text-primary-200 max-w-2xl mx-auto">
+        <p className="text-white/70 max-w-2xl mx-auto">
           Une question ? Un projet ? Notre équipe est à votre écoute.
         </p>
       </section>

@@ -23,6 +23,15 @@ export async function POST(request: Request) {
       },
       channel: { channels: ["email"] },
     });
+
+    // Alimente le compteur "contacts" du tableau de bord propriétaire — ne
+    // doit jamais faire échouer l'envoi du message si cet appel échoue.
+    if (body.propertyId) {
+      axios
+        .post(`${API_GATEWAY_URL}/properties/${body.propertyId}/inquiry`)
+        .catch(() => {});
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: "Échec de l'envoi" }, { status: 500 });

@@ -8,11 +8,12 @@ export interface PropertySearchResult {
   location: {
     address: string;
     city: string;
+    neighborhood?: string | null;
     postalCode: string;
     country: string;
     geoPoint: {
-      latitude: number;
-      longitude: number;
+      lat: number;
+      lon: number;
     };
   };
   features: {
@@ -57,6 +58,7 @@ export interface SearchFilters {
   location?: {
     city?: string;
     country?: string; // ⬅️ ajouté
+    neighborhood?: string; // ⬅️ doit être présent ici
     postalCode?: string; // optionnel
     address?: string; // optionnel
     geoPoint?: { latitude: number; longitude: number };
@@ -65,7 +67,8 @@ export interface SearchFilters {
   features?: {
     bedrooms?: number;
     bathrooms?: number;
-    squareMeters?: { min?: number; max?: number }; // ⬅️ changement : objet avec min/max
+    squareMetersMin?: number;
+    squareMetersMax?: number;
     hasGarden?: boolean;
     hasPool?: boolean;
     hasGarage?: boolean;

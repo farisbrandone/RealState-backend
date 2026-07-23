@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { authApi } from '@/shared/api/endpoints/auth.endpoints';
 import { useAuthStore } from '../stores/auth.store';
 import { toast } from 'react-hot-toast';
-import { setAccessTokenCookie } from '@/shared/lib/storage/token.storage';
 
 export const useLogin = () => {
   const router = useRouter();
@@ -19,7 +18,6 @@ export const useLogin = () => {
       const { accessToken, refreshToken, user } = response.data;
       setTokens(accessToken, refreshToken);
       setUser(user);
-      setAccessTokenCookie(accessToken);
       toast.success('Connexion réussie');
       router.push('/');
     },

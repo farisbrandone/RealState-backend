@@ -7,6 +7,9 @@ import { useSendMessage } from "@/features/chat/hooks/useSendMessage";
 import { useTyping } from "@/features/chat/hooks/useTyping";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { usePresence } from "@/features/user-profile/hooks/usePresence";
+import { chatApi } from "@/features/chat/api/chat.api";
+import { getMediaUrl } from "@/shared/lib/media/media-url";
+import { toast } from "react-hot-toast";
 import {
   PaperAirplaneIcon,
   PaperClipIcon,
@@ -16,6 +19,7 @@ import {
   VideoCameraIcon,
   CheckIcon,
   CheckCircleIcon,
+  DocumentIcon,
 } from "@heroicons/react/24/outline";
 
 interface ChatWindowProps {
@@ -29,6 +33,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const [input, setInput] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
+  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -76,11 +81,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     else stopTyping();
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // Upload via chat API
-      console.log("Upload:", file.name);
+    e.target.value = "";
+    if (!file) return;
+
+    setIsUploadingAttachment(true);
+    try {
+      const { data: attachment } = await chatApi.uploadAttachment(file);
+      sendMutation.mutate({
+        conversationId,
+        content: file.name,
+        type: attachment.type === "file" ? "FILE" : "IMAGE",
+        attachments: [attachment],
+      });
+    } catch {
+      toast.error("Échec de l'envoi de la pièce jointe");
+    } finally {
+      setIsUploadingAttachment(false);
     }
   };
 
@@ -103,8 +121,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   return (
     <div className="flex flex-col h-full bg-[#e8e2d9]">
       {/* En-tête */}
-      <div className="px-4 py-3 bg-white border-b border-primary-100 flex items-center gap-3 z-10">
+      <div className="px-4 py-3 bg-surface border-b border-primary-100 flex items-center gap-3 z-10">
         <button
+          type="button"
+          title="Retour"
           onClick={onBack}
           className="md:hidden p-1 hover:bg-primary-50 rounded-lg"
         >
@@ -128,15 +148,22 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-1">
+          {/* Appels audio/vidéo : pas encore implémentés (nécessitent une
+              infrastructure WebRTC dédiée) — désactivés plutôt que factices,
+              pour ne pas laisser croire à une fonctionnalité qui n'agit pas. */}
           <button
-            className="p-2 hover:bg-primary-50 rounded-lg"
-            title="Appel audio"
+            type="button"
+            disabled
+            className="p-2 rounded-lg cursor-not-allowed opacity-40"
+            title="Appel audio — bientôt disponible"
           >
             <PhoneIcon className="h-5 w-5 text-primary-400" />
           </button>
           <button
-            className="p-2 hover:bg-primary-50 rounded-lg"
-            title="Appel vidéo"
+            type="button"
+            disabled
+            className="p-2 rounded-lg cursor-not-allowed opacity-40"
+            title="Appel vidéo — bientôt disponible"
           >
             <VideoCameraIcon className="h-5 w-5 text-primary-400" />
           </button>
@@ -153,7 +180,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
               >
                 <div
-                  className={`h-12 w-36 ${i % 2 === 0 ? "bg-white" : "bg-accent/20"} rounded-2xl animate-pulse`}
+                  className={`h-12 w-36 ${i % 2 === 0 ? "bg-surface" : "bg-accent/20"} rounded-2xl animate-pulse`}
                 />
               </div>
             ))}
@@ -178,12 +205,52 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         className={`max-w-[75%] px-4 py-2.5 shadow-sm ${
                           isMine
                             ? "bg-[#d9fdd3] rounded-t-2xl rounded-l-2xl rounded-br-md"
-                            : "bg-white rounded-t-2xl rounded-r-2xl rounded-bl-md"
+                            : "bg-surface rounded-t-2xl rounded-r-2xl rounded-bl-md"
                         }`}
                       >
-                        <p className="text-sm text-primary-900 whitespace-pre-wrap break-words">
-                          {msg.content}
-                        </p>
+                        {msg.attachments?.length > 0 && (
+                          <div className="mb-1.5 space-y-1.5">
+                            {msg.attachments.map(
+                              (att: {
+                                id: string;
+                                url: string;
+                                type: string;
+                              }) =>
+                                att.type === "image" ? (
+                                  <a
+                                    key={att.id}
+                                    href={getMediaUrl(att.url) ?? att.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      src={getMediaUrl(att.url) ?? att.url}
+                                      alt="Pièce jointe"
+                                      className="max-h-48 rounded-lg object-cover"
+                                    />
+                                  </a>
+                                ) : (
+                                  <a
+                                    key={att.id}
+                                    href={getMediaUrl(att.url) ?? att.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 rounded-lg bg-black/5 px-3 py-2 text-xs text-primary-700 hover:bg-black/10"
+                                  >
+                                    <DocumentIcon className="h-4 w-4 shrink-0" />
+                                    <span className="truncate">
+                                      {msg.content || "Fichier joint"}
+                                    </span>
+                                  </a>
+                                ),
+                            )}
+                          </div>
+                        )}
+                        {!msg.attachments?.length && (
+                          <p className="text-sm text-primary-900 whitespace-pre-wrap break-words">
+                            {msg.content}
+                          </p>
+                        )}
                         <div
                           className={`flex items-center gap-1 justify-end mt-0.5`}
                         >
@@ -212,26 +279,33 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       </div>
 
       {/* Barre de saisie */}
-      <div className="px-4 py-3 bg-white border-t border-primary-100">
+      <div className="px-4 py-3 bg-surface border-t border-primary-100">
         <div className="flex items-end gap-2">
           <button
+            type="button"
+            title="Émojis"
             onClick={() => setShowEmoji(!showEmoji)}
             className="p-2 hover:bg-primary-50 rounded-lg transition-colors"
           >
             <FaceSmileIcon className="h-5 w-5 text-primary-400" />
           </button>
+          <input
+            title="Joindre un fichier"
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileUpload}
+            className="hidden"
+            accept="image/*,application/pdf"
+          />
           <button
+            type="button"
+            title="Joindre un fichier"
+            disabled={isUploadingAttachment}
             onClick={() => fileInputRef.current?.click()}
-            className="p-2 hover:bg-primary-50 rounded-lg transition-colors"
+            className="p-2 hover:bg-primary-50 rounded-lg transition-colors disabled:opacity-50"
           >
-            <PaperClipIcon className="h-5 w-5 text-primary-400" />
-            <input
-              title="file"
-              ref={fileInputRef}
-              type="file"
-              onChange={handleFileUpload}
-              className="hidden"
-              accept="image/*,application/pdf"
+            <PaperClipIcon
+              className={`h-5 w-5 text-primary-400 ${isUploadingAttachment ? "animate-pulse" : ""}`}
             />
           </button>
           <textarea
@@ -243,9 +317,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             rows={1}
           />
           <button
+            type="button"
+            title="Envoyer"
             onClick={handleSend}
             disabled={!input.trim() || sendMutation.isPending}
-            className="bg-accent text-white p-2.5 rounded-full hover:bg-accent-dark disabled:opacity-50 transition-colors"
+            className="bg-accent text-ink p-2.5 rounded-full hover:bg-accent-dark disabled:opacity-50 transition-colors"
           >
             <PaperAirplaneIcon className="h-5 w-5" />
           </button>

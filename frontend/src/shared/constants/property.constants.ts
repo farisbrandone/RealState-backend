@@ -28,6 +28,7 @@ export const AMENITIES = [
   { key: "hasPool", label: "Piscine" },
   { key: "hasGarage", label: "Garage" },
   { key: "hasTerrace", label: "Terrasse" },
+  { key: "hasBalcony", label: "Balcon" }, // ⬅️ ajouté — corrige
   { key: "hasVeranda", label: "Véranda" },
   { key: "hasElevator", label: "Ascenseur" },
   { key: "hasParking", label: "Parking" },

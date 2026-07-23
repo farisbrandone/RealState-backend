@@ -9,7 +9,7 @@ export default function NotFound() {
         <p className="text-primary-500 mb-8">
           La page que vous recherchez n’existe pas ou a été déplacée.
         </p>
-        <Link href="/" className="bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-dark">
+        <Link href="/" className="bg-accent text-ink px-6 py-3 rounded-lg hover:bg-accent-dark">
           Retour à l’accueil
         </Link>
       </div>

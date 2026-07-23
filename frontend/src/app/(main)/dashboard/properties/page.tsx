@@ -7,9 +7,14 @@ import { usePublishProperty } from "@/features/property-management/hooks/usePubl
 import { Button } from "@/shared/ui/components/Button/Button";
 import { Card } from "@/shared/ui/components/Card/Card";
 import { formatPrice } from "@/shared/lib/formatters/currency.formatter";
-import { PencilIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import {
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  EnvelopeOpenIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { toast } from "react-hot-toast";
+import { getMediaUrl } from "@/shared/lib/media/media-url";
 
 export default function MyPropertiesPage() {
   const user = useAuthStore((s) => s.user);
@@ -24,8 +29,6 @@ export default function MyPropertiesPage() {
       deleteMutation.mutate(id);
     }
   };
-
-  console.log(properties);
 
   return (
     <div>
@@ -57,30 +60,41 @@ export default function MyPropertiesPage() {
               <div className="flex items-center gap-4">
                 <img
                   src={
-                    property._media?.[0]?.url ||
+                    getMediaUrl(property.media?.[0]?.url) ||
                     "/images/property-placeholder.jpg"
                   }
-                  alt=""
+                  alt={property.title}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
                 <div>
                   <h3 className="font-medium">{property.title}</h3>
                   <p className="text-sm text-primary-500">
                     {formatPrice(
-                      property._listing?.price?.amount,
-                      property._listing?.price?.currency,
+                      property.listing?.price?.amount,
+                      property.listing?.price?.currency,
                     )}{" "}
                     -{" "}
                     <span
                       className={
-                        property._status === "published"
+                        property.status === "published"
                           ? "text-green-600"
                           : "text-orange-500"
                       }
                     >
-                      {property._status === "published"
+                      {property.status === "published"
                         ? "Publiée"
                         : "Brouillon"}
+                    </span>
+                  </p>
+                  <p className="mt-1 flex items-center gap-3 text-xs text-primary-400">
+                    <span className="flex items-center gap-1">
+                      <EyeIcon className="h-3.5 w-3.5" />
+                      {property.viewCount ?? 0} vue{(property.viewCount ?? 0) > 1 ? "s" : ""}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <EnvelopeOpenIcon className="h-3.5 w-3.5" />
+                      {property.inquiryCount ?? 0} contact
+                      {(property.inquiryCount ?? 0) > 1 ? "s" : ""}
                     </span>
                   </p>
                 </div>
@@ -100,22 +114,34 @@ export default function MyPropertiesPage() {
                   <Button
                     variant="outline"
                     size="sm"
+                    disabled={
+                      unpublish.isPending && unpublish.variables === property.id
+                    }
                     onClick={() => unpublish.mutate(property.id)}
                   >
-                    Dépublier
+                    {unpublish.isPending && unpublish.variables === property.id
+                      ? "Dépublication..."
+                      : "Dépublier"}
                   </Button>
                 ) : (
                   <Button
                     variant="outline"
                     size="sm"
+                    disabled={publish.isPending && publish.variables === property.id}
                     onClick={() => publish.mutate(property.id)}
                   >
-                    Publier
+                    {publish.isPending && publish.variables === property.id
+                      ? "Publication..."
+                      : "Publier"}
                   </Button>
                 )}
                 <Button
                   variant="outline"
                   size="sm"
+                  disabled={
+                    deleteMutation.isPending &&
+                    deleteMutation.variables === property.id
+                  }
                   onClick={() => handleDelete(property.id)}
                 >
                   <TrashIcon className="h-4 w-4 text-red-500" />
